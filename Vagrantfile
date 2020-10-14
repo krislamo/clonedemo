@@ -7,7 +7,6 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
 
     apt-get update
-    apt-get upgrade -y
     apt-get install expect -y
 
     if [ ! -f /home/vagrant/1.5.9.tar.gz ]; then
