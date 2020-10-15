@@ -10,8 +10,7 @@ FOG_HOSTS = {
   },
   :fogclient => {
     :vagrantbox => BOXNAME,
-    :hostname   => "fogclient",
-    :ip         => "172.20.4.3"
+    :hostname   => "fogclient"
   }
 }
 
@@ -21,7 +20,23 @@ Vagrant.configure("2") do |config|
     config.vm.define name do |conf|
       conf.vm.box      = settings[:vagrantbox]
       conf.vm.hostname = settings[:hostname]
-      conf.vm.network "private_network", ip: settings[:ip]
+
+      if settings[:hostname] == "fogclient"
+        conf.vm.provider :virtualbox do |virtualbox|
+          virtualbox.gui = "true"
+          virtualbox.customize [
+            'modifyvm', :id,
+            '--nic1', 'intnet',
+            '--intnet1', 'pxe_network',
+            '--boot1', 'net',
+            '--boot2', 'none',
+            '--boot3', 'none',
+            '--boot4', 'none'
+          ]
+        end
+      else
+        conf.vm.network "private_network", ip: settings[:ip], virtualbox__intnet: "pxe_network"
+      end
 
       conf.vm.provision "shell", inline: <<-SHELL
 
